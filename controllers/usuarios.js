@@ -13,18 +13,12 @@ const usuariosGET = (req = request, res = response) => {
         limit
     })
 }
+
 const usuariosPOST = async (req, res = response) => {
 
     const { nombre, correo, password, role } = req.body;
     const user = new Usuario( { nombre, correo, password, role } )
 
-    //Verificar si el correo existe
-    const existeEmail = await Usuario.findOne({ correo })
-    if( existeEmail) {
-        return res.status(400).json({
-            msg: 'El correo ya esta registrado'
-        })
-    }
     //Encriptar la contraseña
     const salt = bcryptjs.genSaltSync()
     user.password = bcryptjs.hashSync( password, salt )
@@ -43,6 +37,7 @@ const usuariosPUT = (req, res = response) => {
         id
     })
 }
+
 const usuariosPATCH = (req, res = response) => {
     res.json({
         msg: 'patch API desde el controllador'
