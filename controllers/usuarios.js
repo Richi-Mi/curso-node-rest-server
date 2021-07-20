@@ -3,14 +3,24 @@ const bcryptjs = require('bcryptjs')
 
 const Usuario = require('../models/usuario')
 
-const usuariosGET = (req = request, res = response) => {
-    const { nombre = 'No name', apikey, page = 1, limit } = req.query
+const usuariosGET = async (req = request, res = response) => {
+
+    const { limite = 5, desde = 0 } = req.query
+    
+    // const usuarios = await Usuario.find({ estado: true })
+    //     .skip( Number(desde) )
+    //     .limit( Number(limite) )
+    // const total = await Usuario.countDocuments({ estado: true }) 
+    
+    const [ total, usuarios ] = await Promise.all([
+        Usuario.countDocuments({ estado: true }), //cuenta cuantos documentos hay en la db
+        Usuario.find({ estado: true })
+            .skip( Number(desde) )
+            .limit( Number(limite) )
+    ]) //Manda un arreglo con todas las promesas que se ejecuten
     res.json({
-        msg: 'get API desde el controllador',
-        nombre,
-        apikey,
-        page,
-        limit
+        total,
+        usuarios
     })
 }
 
@@ -43,10 +53,7 @@ const usuariosPUT = async (req, res = response) => {
     }
     //Con esto encontramos el usuario y lo actualizamos en la  DB
     const usuario = await Usuario.findByIdAndUpdate( id, resto )
-    res.json({
-        msg: 'PUT realizado correctamente',
-        usuario
-    })
+    res.json(usuario)
 }
 
 const usuariosPATCH = (req, res = response) => {
