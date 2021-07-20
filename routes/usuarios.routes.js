@@ -9,7 +9,7 @@ const {
         usuariosPATCH, 
         usuariosDELETE 
     } = require('../controllers/usuarios')
-const Role = require('../models/role')
+const { esRoleValido } = require('../helpers/db-validators')
 const router = Router()
 
 router.get('/', usuariosGET)
@@ -20,13 +20,7 @@ router.post('/', [ //Haciendo validaciones con check() de expressvalidator
     check('correo', 'El correo no es valido').isEmail(),
     // check('role', 'No es un rol perimitido').isIn(['ADMIN_ROLE', 'USER_ROLE']), verificamos si el valor de role es algunon de estos 2
 
-    check('role').custom( async (role = '') => {
-        const existeRole = await Role.findOne({ role }) 
-        if( !existeRole ) {
-            throw new Error(`El role ${role} no esta registrado en la base de datos`)
-        }
-    }),
-
+    check('role').custom( esRoleValido ),
     validarCampos
 ],usuariosPOST)
 

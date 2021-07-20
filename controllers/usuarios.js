@@ -33,6 +33,7 @@ const usuariosPOST = async (req, res = response) => {
 
     res.status(201).json({
         msg: 'Confirmo, tu POST salio bien',
+        user
     })
 }
 const usuariosPUT = (req, res = response) => {
