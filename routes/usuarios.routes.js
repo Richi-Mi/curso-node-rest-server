@@ -16,7 +16,8 @@ const router = Router()
 
 router.get('/', usuariosGET)
 
-router.post('/', [ //Haciendo validaciones con check() de expressvalidator
+router.post('/', [ 
+    //Haciendo validaciones con check() de expressvalidator
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('password', 'El password es obligatorio y mas de 6 letras').isLength({ min: 6}),
     check('correo', 'El correo no es valido').isEmail(),
@@ -25,14 +26,17 @@ router.post('/', [ //Haciendo validaciones con check() de expressvalidator
     check('role').custom( esRoleValido ),
 
     validarCampos
+
 ],usuariosPOST)
 
 router.put('/:id', [
+
     check('id', 'No es un ID valido').isMongoId(),
     check('id').custom( existeUsuarioPorId ),
     check('role').custom( esRoleValido ),
 
     validarCampos
+    
 ], usuariosPUT)
 
 router.patch('/', usuariosPATCH)
