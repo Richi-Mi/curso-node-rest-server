@@ -17,11 +17,11 @@ const usuariosGET = (req = request, res = response) => {
 const usuariosPOST = async (req, res = response) => {
 
     const { nombre, correo, password, role } = req.body;
-    const user = new Usuario( { nombre, correo, password, role } )
+    const user = new Usuario({ nombre, correo, password, role })
 
     //Encriptar la contraseña
     const salt = bcryptjs.genSaltSync()
-    user.password = bcryptjs.hashSync( password, salt )
+    user.password = bcryptjs.hashSync(password, salt)
     //Guardar en DB
     await user.save() //Guardamos en la base de datos
 
@@ -30,11 +30,22 @@ const usuariosPOST = async (req, res = response) => {
         user
     })
 }
-const usuariosPUT = (req, res = response) => {
+
+const usuariosPUT = async (req, res = response) => {
     const { id } = req.params
+    const { _id, password, google, correo, ...resto } = req.body
+    //TODO: Validar contra base de datos
+
+    if (password) {
+        //Encriptar la contraseña
+        const salt = bcryptjs.genSaltSync()
+        resto.password = bcryptjs.hashSync(password, salt)
+    }
+    //Con esto encontramos el usuario y lo actualizamos en la  DB
+    const usuario = await Usuario.findByIdAndUpdate( id, resto )
     res.json({
-        msg: 'put API desde el controllador',
-        id
+        msg: 'PUT realizado correctamente',
+        usuario
     })
 }
 
