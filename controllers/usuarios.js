@@ -61,10 +61,16 @@ const usuariosPATCH = (req, res = response) => {
         msg: 'patch API desde el controllador'
     })
 }
-const usuariosDELETE = (req, res = response) => {
-    res.json({
-        msg: 'delete API desde el controllador'
-    })
+const usuariosDELETE = async (req, res = response) => {
+    const { id } = req.params
+
+    //Fisicamente lo borramos
+    // const usuario = await Usuario.findByIdAndDelete( id )
+
+    //Simulamos que lo borramos pero en realidad lo dejamos para la integridad del sitio,
+    //Si embargo ya nadie podra acceder a el
+    const usuario = await Usuario.findByIdAndUpdate( id, { estado: false } )
+    res.json({ usuario })
 }
 module.exports = {
     usuariosGET,
