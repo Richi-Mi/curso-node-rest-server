@@ -16,7 +16,6 @@ const dbConnection = async () => {
         throw new Error('Error a la hora de iniciar la base de Datos')
     }
 }
-
 module.exports = {
     dbConnection
 }
