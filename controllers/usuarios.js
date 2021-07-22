@@ -3,9 +3,10 @@ const bcryptjs = require('bcryptjs')
 
 const Usuario = require('../models/usuario')
 
-const usuariosGET = async (req = request, res = response) => {
+const usuariosGET = async(req = request, res = response) => {
 
     const { limite = 5, desde = 0 } = req.query
+    const query = { estado: true }
     
     // const usuarios = await Usuario.find({ estado: true })
     //     .skip( Number(desde) )
@@ -13,8 +14,8 @@ const usuariosGET = async (req = request, res = response) => {
     // const total = await Usuario.countDocuments({ estado: true }) 
     
     const [ total, usuarios ] = await Promise.all([
-        Usuario.countDocuments({ estado: true }), //cuenta cuantos documentos hay en la db
-        Usuario.find({ estado: true })
+        Usuario.countDocuments(query), //cuenta cuantos documentos hay en la db
+        Usuario.find(query)
             .skip( Number(desde) )
             .limit( Number(limite) )
     ]) //Manda un arreglo con todas las promesas que se ejecuten
