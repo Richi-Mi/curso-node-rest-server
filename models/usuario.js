@@ -1,6 +1,10 @@
 const { Schema, model } = require('mongoose')
 
 const UsuarioSchema = Schema({
+    uid: {
+        type: String,
+        unique: true
+    },
     nombre: {
         type: String,
         required: [true, 'El nombre es obligatorio']
@@ -33,7 +37,10 @@ const UsuarioSchema = Schema({
 })
 //Removemos __v y password para que no se vean en un JSON
 UsuarioSchema.methods.toJSON = function() {
-    const { __v, password, ...usuario } = this.toObject()
+    const { __v, password, _id, ...usuario } = this.toObject()
+    //Generar el uid
+    usuario.uid = _id
+
     return usuario 
 }
 module.exports = model('Usuario', UsuarioSchema)
