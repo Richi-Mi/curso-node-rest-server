@@ -2,7 +2,7 @@ const { Router } = require('express')
 const { check } = require('express-validator')
 
 const { validarCampos, validarJWT, esAdminRole, tieneRole } = require('../middlewares/index')
-const { esRoleValido, emailExiste, existeUsuarioPorId }     = require('../helpers/db-validators')
+const { esRoleValido, existeProducto } = require('../helpers/db-validators')
 
 const {
     obtenerProductos,
@@ -16,12 +16,19 @@ const router = Router()
 
 router.get('/', obtenerProductos)
 
-router.get('/:id', obtenerProducto)
+router.get('/:id', [
+    // Revisamos que el ID del producto sea valido, y que exista
+    check('id', 'Tiene que ser un ID valido de MongoDB').isMongoId(),
+    check('id').custom(existeProducto),
+
+    validarCampos
+], obtenerProducto)
 
 router.post('/', [
 
     validarJWT,
 
+    // Revisamos los datos que queremos insertar en la DB
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('precio', 'El precio debe ser un numero').isNumeric(),
     check('descripcion', 'Tiene que tener una descripcion').not().isEmpty(),
@@ -31,8 +38,32 @@ router.post('/', [
 
 ], crearProducto)
 
-router.put('/:id', actualizarProducto)
+router.put('/:id', [
+    validarJWT,
 
-router.delete('/:id', eliminarProducto)
+    // Revisamos que el ID del producto sea valido, y que exista
+    check('id', 'Tiene que ser un ID valido de MongoDB').isMongoId(),
+    check('id').custom(existeProducto),
+
+    // Revisamos los datos que queremos actualizar
+    check('disponible', 'El disponible tiene que ser booleano').isBoolean(),
+    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    check('precio', 'El precio debe ser un numero').isNumeric(),
+    check('descripcion', 'Tiene que tener una descripcion').not().isEmpty(),
+
+    // Validamos todos los campos, y se hay errores paramosel programa
+    validarCampos
+], actualizarProducto)
+
+router.delete('/:id', [
+    validarJWT,
+
+    // Revisamos que el ID del producto sea valido, y que exista
+    check('id', 'Tiene que ser un ID valido de MongoDB').isMongoId(),
+    check('id').custom(existeProducto),
+
+    // Validamos todos los campos, y se hay errores paramosel programa
+    validarCampos
+], eliminarProducto)
 
 module.exports = router

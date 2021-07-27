@@ -60,7 +60,7 @@ const actualizarCategoria = async (req, res) => {
     const { usuario,  estado, ...data } = req.body
 
     data.nombre = data.nombre.toUpperCase()
-    data.usuario = req.usuario._id
+    data.usuario = req.usuarioAuth._id
 
     const categoria = await Categoria.findByIdAndUpdate( id, data, { new: true } )
     res.status(202).json({

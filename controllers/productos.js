@@ -1,10 +1,30 @@
-const { Producto, Categoria, Usuario } = require('../models/index')
+const { Producto, Categoria } = require('../models/index')
 
-const obtenerProductos = (req, res) => {
-    res.send('Obtenemos los productos')
+const obtenerProductos = async (req, res) => {
+    const { limite = 5, desde = 0 } = req.query
+    const query = { estado: true }
+
+    const [total, productos] = await Promise.all([
+        Producto.countDocuments(query), 
+        Producto.find(query)
+            .skip(Number(desde))
+            .limit(Number(limite))
+            .populate('usuario', 'nombre')
+            .populate('categoria', 'nombre')
+    ]) 
+    res.status(200).json({
+        total,
+        productos
+    })
 }
-const obtenerProducto = (req, res) => {
-    res.send('Obtenemos un producto')
+const obtenerProducto = async (req, res) => {
+    const { id } = req.params
+
+    const producto = await Producto.findById( id ).populate('usuario', 'nombre').populate('categoria', 'nombre')
+    res.status(200).json({
+        msg: 'GET Product hecho',
+        producto
+    })
 }
 const crearProducto = async (req, res) => {
     let { nombre, precio, descripcion, categoria } = req.body
@@ -42,11 +62,31 @@ const crearProducto = async (req, res) => {
         producto
     })
 }
-const actualizarProducto = (req, res) => {
-    res.send('Actualizamos producto')
+const actualizarProducto = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { estado, categoria, ...data } = req.body
+    
+        data.usuario = req.usuarioAuth._id
+    
+        const producto = await Producto.findByIdAndUpdate( id, data, { new: true }).populate('usuario', 'nombre').populate('categoria', 'nombre')
+
+        res.status(201).json({
+            producto
+        })
+    } catch(err) {
+        res.status(501).json({
+            err
+        })
+    }
 }
-const eliminarProducto = (req, res) => {
-    res.send('Eliminamos un producto')
+const eliminarProducto = async (req, res) => {
+    const { id } = req.params
+    const producto = await Producto.findByIdAndUpdate( id, { estado: false, disponible: false }, { new: true } )
+
+    res.status(200).json({
+        producto
+    })
 }
 module.exports = {
     obtenerProductos,
