@@ -1,5 +1,21 @@
 const { Categoria } = require('../models')
 
+// Obtener categorias - paginado - total - populate
+const obtenerCategorias = async (req, res) => {
+    res.send('Obtener categorias')
+}
+// Obtener categoria - populate {devuelve categoria}
+const obtenerCategoria = async (req, res) => {
+    const { id } = req.params
+    const categoria = await Categoria.findById( id )
+
+
+    res.json({
+        categoria
+    })
+}
+
+// Crear Categoria
 const crearCategoria = async (req, res) => {
     const nombre = req.body.nombre.toUpperCase()
 
@@ -25,6 +41,19 @@ const crearCategoria = async (req, res) => {
     })
 }
 
+// Actualizar Categoria
+const actualizarCategoria = async (req, res) => {
+    res.send('Actualizamos las categorias')
+}
+
+// Borrar categoria - estado: false
+const borrarCategoria = async (req, res) => {
+    res.send('Borrar categoria')
+}
 module.exports = {
-    crearCategoria
+    obtenerCategorias,
+    crearCategoria,
+    obtenerCategoria,
+    actualizarCategoria,
+    borrarCategoria
 }
