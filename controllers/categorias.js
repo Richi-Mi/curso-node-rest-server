@@ -2,15 +2,28 @@ const { Categoria } = require('../models')
 
 // Obtener categorias - paginado - total - populate
 const obtenerCategorias = async (req, res) => {
-    res.send('Obtener categorias')
+    const { limite = 5, desde = 0 } = req.query
+    const query = { estado: true }
+
+    const [total, categorias] = await Promise.all([
+        Categoria.countDocuments(query), //cuenta cuantos documentos hay en la db
+        Categoria.find(query)
+            .skip(Number(desde))
+            .limit(Number(limite))
+            .populate('usuario', 'nombre')
+    ]) //Manda un arreglo con todas las promesas que se ejecuten
+    res.status(200).json({
+        total,
+        categorias
+    })
 }
 // Obtener categoria - populate {devuelve categoria}
 const obtenerCategoria = async (req, res) => {
     const { id } = req.params
-    const categoria = await Categoria.findById( id )
 
+    const categoria = await Categoria.findById( id ).populate('usuario')
 
-    res.json({
+    res.status(200).json({
         categoria
     })
 }
@@ -43,12 +56,26 @@ const crearCategoria = async (req, res) => {
 
 // Actualizar Categoria
 const actualizarCategoria = async (req, res) => {
-    res.send('Actualizamos las categorias')
+    const { id } = req.params
+    const { usuario,  estado, ...data } = req.body
+
+    data.nombre = data.nombre.toUpperCase()
+    data.usuario = req.usuario._id
+
+    const categoria = await Categoria.findByIdAndUpdate( id, data, { new: true } )
+    res.status(202).json({
+        categoria
+    })
 }
 
 // Borrar categoria - estado: false
 const borrarCategoria = async (req, res) => {
-    res.send('Borrar categoria')
+    const { id } = req.params
+    const categoria = await Categoria.findByIdAndUpdate( id, { estado: false }, { new: true } )
+
+    res.status(200).json({
+        categoria
+    })
 }
 module.exports = {
     obtenerCategorias,
