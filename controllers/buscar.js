@@ -9,7 +9,7 @@ const coleccionesPermitidas = [
     'roles'
 ]
 
-const buscarUsuarios = async (termino = '', res) => {
+const buscarUsuarios   = async (termino = '', res) => {
     const esMongoID = ObjectId.isValid( termino ) // TRue
 
     if( esMongoID ) {
@@ -46,11 +46,11 @@ const buscarCategorias = async (termino = '', res) => {
         results: categorias
     })
 }
-const buscarProductos = async (termino = '', res ) => {
+const buscarProductos  = async (termino = '', res ) => {
     const esMongoID = ObjectId.isValid( termino ) // TRue
 
     if( esMongoID ) {
-        const producto = await Producto.findById(termino);
+        const producto = await Producto.findById(termino).populate('usuario', 'nombre').populate('categoria', 'nombre')
         return res.status(200).json({
             results: ( producto ) ? [ producto ] : []
         })
@@ -59,7 +59,7 @@ const buscarProductos = async (termino = '', res ) => {
 
     const productos = await Producto.find({ 
         $and: [ { estado: true }, { nombre: regexp } ],
-    })
+    }).populate('usuario', 'nombre').populate('categoria', 'nombre');
     res.status(200).json({
         results: productos
     })
@@ -74,15 +74,19 @@ const buscar = (req, res) => {
     }
 
     switch (coleccion) {
+
         case 'usuario':
             buscarUsuarios(termino, res)
         break;
+
         case 'producto':
             buscarProductos(termino, res)
         break;        
+
         case 'categoria':
             buscarCategorias(termino, res)
         break;
+
         default:
             res.status(500).json({
                 msg: ' Se me olvido hacer esta coleccion jiji'
