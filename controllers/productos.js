@@ -49,7 +49,7 @@ const crearProducto = async (req, res) => {
 
     const data = {
         categoria: categoriaDB._id,
-        nombre,
+        nombre: nombre.toUpperCase(),
         precio,
         descripcion,
         usuario: req.usuarioAuth._id
