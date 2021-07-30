@@ -4,6 +4,9 @@ const { v4: uuidv4 } = require('uuid')
 
 const subirArchivo = ({ files }, carpeta = '', extensionesValidas = ['png', 'jpeg', 'jpg', 'gif']) => {
     return new Promise( (resolve, reject) => {
+        if(files === undefined) {
+            return reject('No hay archivos en la peticion')
+        }
         const { archivo } = files
         const nombreCortado = archivo.name.split('.')
         const extension = nombreCortado[nombreCortado.length - 1]
